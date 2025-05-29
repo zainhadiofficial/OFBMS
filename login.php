@@ -1,14 +1,75 @@
-<?php include_once 'helpers/helper.php'; ?>
-
-<?php subview('header.php'); ?>
-<link rel="stylesheet" href="assets/css/form.css">
+<?php include_once 'header.php'; ?>
 <?php
 if(isset($_GET['pwd'])) {
     if($_GET['pwd']=='updated') {
         echo "<script>alert('Your password has been reset!!');</script>";
     }
-}    
+}
 ?>
+<link rel="stylesheet" href="../assets/css/form.css">
+<style>
+  body {
+    /* padding-top: 20px; */
+    background: transparent
+  }    
+  input {
+    border :0px !important;
+    border-bottom: 2px solid #424242 !important;
+    color :#424242 !important;
+    border-radius: 0px !important;
+    font-weight: bold !important;
+    background-color: whitesmoke !important;    
+  }
+  *:focus {
+    outline: none !important;
+  }
+  label {
+    color : #828282 !important;
+    font-size: 19px;
+  }
+  h5.form-name {
+    color: #424242;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 50;
+    margin-bottom: 0px !important;
+    margin-top: 10px;
+  }
+  h1 {
+    font-size: 45px !important;
+    margin-bottom: 20px;  
+    font-family :'product sans';
+    font-weight: bolder;
+  }
+  div.form-out {
+    /* border-radius: 40px; */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);  
+    background-color: whitesmoke !important;
+    padding: 40px;
+    margin-top: 80px;
+  }
+  .input-group {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+  select {
+    float: right;
+    font-weight: bold !important;
+    color :#424242 !important;
+  }
+  @media screen and (max-width: 900px){
+    body {
+      background-color: lightblue;
+      background-image: none;
+    }
+    div.form-out {
+    padding: 20px;
+    background-color: none !important;
+    margin-top: 20px;
+  }  
+}  
+</style>
+<main>
 <?php
 if(isset($_GET['error'])) {
     if($_GET['error'] === 'invalidcred') {
@@ -19,137 +80,24 @@ if(isset($_GET['error'])) {
         echo"<script>alert('Database error')</script>";
     }
 }
-if(isset($_COOKIE['Uname']) && isset($_COOKIE['Upwd'])) {
-  require 'helpers/init_conn_db.php';   
-  $email_id = $_POST['user_id'];
-  $password = $_POST['user_pass'];
-  $sql = 'SELECT * FROM Users WHERE username=? OR email=?;';
-  $stmt = mysqli_stmt_init($conn);
-  if(!mysqli_stmt_prepare($stmt,$sql)) {
-      header('Location: views/login.php?error=sqlerror');
-      exit();            
-  } else {
-      mysqli_stmt_bind_param($stmt,'ss',$_COOKIE['Uname'],$_COOKIE['Uname']);            
-      mysqli_stmt_execute($stmt);
-      $result = mysqli_stmt_get_result($stmt);
-      if($row = mysqli_fetch_assoc($result)) {
-          $pwd_check = password_verify($_COOKIE['Upwd'],$row['password']);
-          if($pwd_check == false) {
-              setcookie('Uname', '',time() - 3600);
-              setcookie('Upwd', '',time() - 3600);              
-              header('Location: views/login.php?error=wrongpwd');
-              exit();    
-          }
-          else if($pwd_check == true) {
-              session_start();
-              $_SESSION['userId'] = $row['user_id'];
-              $_SESSION['userUid'] = $row['username'];
-              $_SESSION['userMail'] = $row['email'];                            
-              header('Location: views/index.php?login=success');
-              exit();                  
-          } else {
-              header('Location: views/login.php?error=invalidcred');
-              exit();                    
-          }
-      }
-      header('Location: views/login.php?error=invalidcred');
-      exit();         
-  }
-  header('Location: views/login.php?error=invalidcred');
-  exit();      
-  mysqli_stmt_close($stmt);
-  mysqli_close($conn);
-}
 ?>
-<style>   
-  input {
-    border :0px !important;
-    border-bottom: 2px solid #838383 !important;
-    color :#838383 !important;
-    border-radius: 0px !important;
-    font-weight: bold !important;
-    background-color: whitesmoke !important;  
-    border: none;
-    border-bottom: 2px solid #838383;      
-  }
-  *:focus {
-    outline: none !important;
-  }
-  label {
-    color : #838383 !important;
-    font-size: 19px;
-  }
-  h5.form-name {
-    color: #838383;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: 50;
-    margin-bottom: 0px !important;
-    margin-top: 10px;
-  }
-  h5 {
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 22px ;
-	  font-family: 'Montserrat', sans-serif;    
-  }
-  a:hover {
-    text-decoration: none;
-  }
-  /* .btn-outline-light {
-    color :#0275d8;
-    border-color: #0275d8 !important;
-  }
-  .btn-outline-light:hover {
-    color: white !important;
-    background-color: #0275d8 !important;
-  } */
-  @font-face {
-  font-family: 'product sans';
-  src: url('assets/css/Product Sans Bold.ttf');
-  }
-  h1 {
-    font-size: 46px !important;
-    margin-bottom: 20px;  
-    font-family :'product sans' !important;
-    font-weight: bolder;
-  }
-  div.form-out {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);  
-    background-color: whitesmoke !important;
-    padding: 40px;
-    margin-top: 60px;
-  }
-  .input-group {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
-  select {
-    float: right;
-    font-weight: bold !important;
-    color :#838383 !important;
-  }
-  @media screen and (max-width: 768px){
-    body {
-      background-color: lightblue;
-      background-image: none;
-    }
-    div.form-out {
-    padding: 20px;
-    background-color: none !important;
-    margin-top: 20px;
-  }  
-}
-</style>
-<main>
 <div class="container mt-0">
   <div class="row">
+    <?php
+    if(isset($_GET['error'])) {
+        if($_GET['error'] === 'destless') {
+            echo "<script>alert('Dest. date/time is less than src.');</script>";
+        } else if($_GET['error'] === 'sqlerr') {
+          echo "<script>alert('Database error');</script>";
+        }
+    }
+    ?>
     <div class="col-md-3"></div>
       <div class="bg-light form-out col-md-6">
-      <h1 class="text-secondary text-center">LOG IN PANEL</h1>
+      <h1 class="text-secondary text-center">ADMIN LOGIN</h1>
       
       <form method="POST" class=" text-center" 
-        action="includes/login.inc.php">
+        action="../includes/admin/login.inc.php">
 
         <div class="form-row">  
             <div class="col-1 p-0 mr-1">
@@ -173,43 +121,24 @@ if(isset($_COOKIE['Uname']) && isset($_COOKIE['Upwd'])) {
                 <input type="password" name="user_pass" id="user_pass"
                       required>
               </div>            
-          </div> 
+          </div>          
+        </div>              
 
-        </div>          
-        <div class="row mt-3">
-       
-          <div class="col">
-          <a id="reset-pass" class="mr-5" href="reset-pwd.php"
-              style="float: right !important;">Reset Password</a>        
-          </div>         
-        </div>   
-        <div class="row mt-4">
-          <div class="col">
-            <a href="register.php">
-              <button type="button" class="btn btn-sm rounded-0 btn-info mt-3">
-                <div style="">
-                <i class="fas fa-user-plus text-light"></i> Register
-                </div>
-              </button>
-            </a> 
-          </div> 
-          <div class="col">
-            <button name="login_but" type="submit" 
-              class="btn btn-sm rounded-0 btn-success mt-3">
-              <div style="">
-              <i class="fa fa-lg fa-arrow-right"></i> Login
-              </div>
-            </button>
-          </div>       
-        </div>       
-      
+        <button name="login_but" type="submit" 
+          class="btn btn-primary rounded-pill mt-5">
+          <div>
+          <i class="fa fa-lg fa-arrow-right"></i> Login 
+          </div>
+        </button>
       </form>
     </div>
     <div class="col-md-3"></div>
     </div>
-</div>  
+</div>    
+</main>
 
-<?php subview('footer.php'); ?> 
+<?php include_once 'footer.php'; ?>
+
 <script>
 $(document).ready(function(){
   $('.input-group input').focus(function(){
@@ -228,18 +157,3 @@ $(document).ready(function(){
   // })
 });
 </script>
-</main>
-
- <?php subview('footer.php'); ?> 
- <footer style="
-        position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 2.5rem;  
-    ">
-	<em><h5 class="text-light text-center p-0 brand mt-2">
-				<img src="assets/images/plane-logo.png" 
-					height="40px" width="40px" alt="">				
-			Online Flight Booking</h5></em>
-	<p class="text-light text-center">&copy; <?php echo date('Y')?></p>
-</footer>
